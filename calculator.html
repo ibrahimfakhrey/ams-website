@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>American Diploma Score Calculator | Al-Alamiya Modern School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --crimson:#ab111e;
+    --crimson-dark:#7c0c16;
+    --crimson-tint:#fbe9ea;
+    --ink:#1c1c1e;
+    --ink-soft:#5c5f66;
+    --line:#e7e5e2;
+    --bg:#f7f6f4;
+    --card:#ffffff;
+    --gold:#c9982e;
+    --ok:#276b4b;
+    --warn:#9a3b2c;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+  }
+  .topbar{
+    background:linear-gradient(120deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+    color:#fff;
+    padding:46px 20px 54px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .topbar::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image: radial-gradient(circle at 15% 20%, rgba(255,255,255,.07) 0, transparent 40%),
+                       radial-gradient(circle at 85% 80%, rgba(255,255,255,.06) 0, transparent 45%);
+    pointer-events:none;
+  }
+  .topbar .eyebrow{
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:12.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    opacity:.85;
+    display:block;
+    margin-bottom:12px;
+  }
+  .topbar h1{
+    font-family:'Poppins', sans-serif;
+    font-weight:800;
+    font-size:clamp(24px,4vw,36px);
+    margin:0 0 12px;
+  }
+  .topbar p{
+    max-width:600px;
+    margin:0 auto;
+    font-size:15px;
+    opacity:.92;
+  }
+  .cohort-badge{
+    display:inline-block;
+    margin-top:18px;
+    padding:6px 16px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.55);
+    background:rgba(255,255,255,.1);
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:.03em;
+  }
+
+  .wrap{ max-width:960px; margin:-28px auto 0; padding:0 18px 70px; position:relative; z-index:2; }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:28px 28px 30px;
+    margin-bottom:22px;
+    box-shadow:0 14px 34px -26px rgba(28,28,30,.35);
+  }
+
+  .step-label{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+  }
+  .step-label .num{
+    width:28px; height:28px;
+    border-radius:50%;
+    background:var(--crimson);
+    color:#fff;
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .step-label h2{
+    font-family:'Poppins', sans-serif;
+    font-size:17px;
+    font-weight:700;
+    margin:0;
+    color:var(--ink);
+  }
+
+  /* pill toggles */
+  .pills{ display:flex; gap:10px; flex-wrap:wrap; }
+  .pills input{ display:none; }
+  .pills label{
+    cursor:pointer;
+    padding:9px 20px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    font-weight:600;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    transition:.15s;
+  }
+  .pills input:checked + label{
+    background:var(--crimson);
+    border-color:var(--crimson);
+    color:#fff;
+  }
+
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px 20px; margin-top:22px; }
+  .grid.cols-3{ grid-template-columns:1fr 1fr 1fr; }
+  .grid.cols-4{ grid-template-columns:1fr 1fr 1fr 1fr; }
+  @media (max-width:640px){ .grid, .grid.cols-3, .grid.cols-4{ grid-template-columns:1fr; } }
+  @media (min-width:641px) and (max-width:800px){ .grid.cols-4{ grid-template-columns:1fr 1fr; } }
+
+  .field label{
+    display:block;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--ink);
+    margin-bottom:7px;
+  }
+  .field .hint{ font-size:12px; color:var(--ink-soft); font-weight:400; }
+  .field input[type=number]{
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    font-family:'Inter', sans-serif;
+    font-size:15.5px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input[type=number]:focus{
+    outline:none;
+    border-color:var(--crimson);
+    box-shadow:0 0 0 3px rgba(171,17,30,.12);
+  }
+  .field input[type=number]:disabled{
+    background:#f1f0ee;
+    color:var(--ink-soft);
+    cursor:not-allowed;
+  }
+
+  .act-preview{
+    margin-top:18px;
+    background:var(--crimson-tint);
+    border:1px dashed var(--crimson);
+    border-radius:10px;
+    padding:14px 16px;
+    font-size:13.5px;
+    color:var(--crimson-dark);
+    display:none;
+  }
+  .act-preview.show{ display:block; }
+  .act-preview b{ font-family:'Poppins', sans-serif; }
+
+  .uni-options{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:20px; }
+  @media (max-width:640px){ .uni-options{ grid-template-columns:1fr; } }
+  .uni-options input{ display:none; }
+  .uni-options label{
+    cursor:pointer; display:block;
+    padding:14px; border:1.5px solid var(--line); border-radius:10px;
+    text-align:center; transition:.15s;
+  }
+  .uni-options label .name{ display:block; font-family:'Poppins', sans-serif; font-weight:700; font-size:14px; }
+  .uni-options label .sub{ display:block; font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
+  .uni-options input:checked + label{ border-color:var(--crimson); background:var(--crimson-tint); }
+  .uni-options input:checked + label .name{ color:var(--crimson-dark); }
+
+  button.calc{
+    width:100%; margin-top:26px; padding:16px;
+    border:none; border-radius:10px;
+    background:var(--crimson); color:#fff;
+    font-family:'Poppins', sans-serif; font-weight:700; font-size:16px;
+    cursor:pointer; transition:background .15s, transform .1s;
+  }
+  button.calc:hover{ background:var(--crimson-dark); }
+  button.calc:active{ transform:scale(.99); }
+
+  .exam-fields{ display:none; }
+  .exam-fields.active{ display:block; }
+
+  /* result */
+  .result{ display:none; }
+  .result.show{ display:block; }
+  .result-inner{
+    display:grid; grid-template-columns:170px 1fr; gap:28px; align-items:center;
+  }
+  @media (max-width:640px){ .result-inner{ grid-template-columns:1fr; justify-items:center; text-align:center; } }
+  .badge{
+    width:150px; height:150px; border-radius:50%;
+    background:conic-gradient(var(--crimson) calc(var(--p,0)*1%), var(--crimson-tint) 0);
+    display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0;
+  }
+  .badge::before{
+    content:""; position:absolute; inset:10px; border-radius:50%; background:#fff;
+  }
+  .badge .pct{
+    position:relative; z-index:1;
+    font-family:'Poppins', sans-serif; font-weight:800; font-size:28px; color:var(--ink);
+  }
+  .badge .pct span{ font-size:14px; color:var(--crimson); font-weight:700; }
+
+  .breakdown h3{ font-family:'Poppins', sans-serif; font-size:16px; margin:0 0 12px; }
+  .row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--line); font-size:13.5px; }
+  .row:last-child{ border-bottom:none; }
+  .row .k{ color:var(--ink-soft); }
+  .row .v{ font-weight:700; font-family:'Poppins', sans-serif; }
+
+  .status{ margin-top:12px; font-size:12.5px; font-weight:700; padding:8px 13px; border-radius:8px; display:inline-block; }
+  .status.ok{ color:var(--ok); background:rgba(39,107,75,.1); }
+  .status.warn{ color:var(--warn); background:rgba(154,59,44,.1); }
+
+  /* rules explanation */
+  .rules-title{ text-align:center; margin:44px 0 22px; }
+  .rules-title h2{ font-family:'Poppins', sans-serif; font-size:22px; margin:0 0 8px; }
+  .rules-title p{ color:var(--ink-soft); font-size:14px; max-width:560px; margin:0 auto; }
+
+  .rules-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  @media (max-width:800px){ .rules-grid{ grid-template-columns:1fr; } }
+
+  .rule-card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px;
+    border-top:4px solid var(--crimson);
+  }
+  .rule-card h3{ font-family:'Poppins', sans-serif; font-size:16px; margin:0 0 4px; }
+  .rule-card .tag{ font-size:11.5px; color:var(--ink-soft); margin-bottom:14px; display:block; }
+  .rule-card ul{ padding-inline-start:18px; margin:0 0 14px; font-size:13px; color:var(--ink-soft); }
+  .rule-card li{ margin-bottom:7px; }
+  .rule-card .bonus{
+    background:var(--crimson-tint); border-radius:9px; padding:12px 13px;
+    font-size:12.5px; color:var(--crimson-dark);
+  }
+  .rule-card .bonus b{ display:block; font-family:'Poppins', sans-serif; margin-bottom:4px; }
+
+  footer{
+    max-width:960px; margin:40px auto 0; font-size:12.5px; color:var(--ink-soft);
+    border-top:1px solid var(--line); padding:20px 18px 0;
+  }
+  footer b{ color:var(--ink); }
+</style>
+<style>html.embedded .topbar{display:none}html.embedded body{background:transparent}</style>
+<script>if(window.self!==window.top)document.documentElement.classList.add("embedded")</script>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="eyebrow">Al-Alamiya Modern School — International</span>
+  <h1>American Diploma Score Calculator</h1>
+  <p>Work out your Egyptian university admission percentage from SAT, EST, or ACT scores plus your GPA — using the official Egyptian universities coordination formula.</p>
+  <span class="cohort-badge">Applies to the Class of 2026–2027 only</span>
+</div>
+
+<div class="wrap">
+
+  <div class="card">
+    <div class="step-label"><span class="num">1</span><h2>Choose your exam</h2></div>
+    <div class="pills">
+      <input type="radio" name="examType" id="examSat" value="SAT" checked>
+      <label for="examSat">SAT</label>
+      <input type="radio" name="examType" id="examEst" value="EST">
+      <label for="examEst">EST</label>
+      <input type="radio" name="examType" id="examAct" value="ACT">
+      <label for="examAct">ACT</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step-label"><span class="num">2</span><h2>Enter your scores</h2></div>
+
+    <!-- SAT / EST fields -->
+    <div class="exam-fields active" id="fieldsSatEst">
+      <div class="grid">
+        <div class="field">
+          <label for="sat1">Exam 1 score <span class="hint">(400–1600)</span></label>
+          <input type="number" id="sat1" min="400" max="1600" placeholder="e.g. 1250">
+        </div>
+      </div>
+    </div>
+
+    <!-- ACT fields -->
+    <div class="exam-fields" id="fieldsAct">
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 14px;">
+        Egyptian coordination scores ACT using Reading, English/Writing, and Math only — enter all four section scores if you have them (each out of 36); Science is optional and won't be counted, it's here just so your full report is on record. Your composite (average of Reading, Writing, and Math) is also out of 36.
+      </p>
+      <div class="grid cols-4">
+        <div class="field">
+          <label for="actReading">Reading <span class="hint">(1–36)</span></label>
+          <input type="number" id="actReading" min="1" max="36" placeholder="e.g. 28">
+        </div>
+        <div class="field">
+          <label for="actWriting">English / Writing <span class="hint">(1–36)</span></label>
+          <input type="number" id="actWriting" min="1" max="36" placeholder="e.g. 27">
+        </div>
+        <div class="field">
+          <label for="actMath">Math <span class="hint">(1–36)</span></label>
+          <input type="number" id="actMath" min="1" max="36" placeholder="e.g. 29">
+        </div>
+        <div class="field">
+          <label for="actScience">Science <span class="hint">(optional, 1–36)</span></label>
+          <input type="number" id="actScience" min="0" max="36" placeholder="e.g. 25">
+        </div>
+      </div>
+      <div class="act-preview" id="actPreview1"></div>
+    </div>
+
+    <!-- Shared subject tests section -->
+    <div style="margin-top:30px; padding-top:24px; border-top:1px solid var(--line);">
+      <div class="step-label" style="margin-bottom:12px;">
+        <span class="num" style="background:var(--ink-soft);">+</span>
+        <h2 style="font-size:15px;">Subject tests <span class="hint" style="font-weight:400;">(optional)</span></h2>
+      </div>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;">
+        Only one subject-test source counts — EST 2 Subject tests, or ACT subject tests. Start typing in one and the other will lock automatically; clear your entry to unlock it again. This applies no matter which exam you selected above (SAT, EST, or ACT).
+      </p>
+      <div class="grid">
+        <div class="field">
+          <label for="est2">EST 2 Subject tests <span class="hint">(optional, 0–1600)</span></label>
+          <input type="number" id="est2" min="0" max="1600" placeholder="e.g. 1100">
+        </div>
+      </div>
+      <div class="grid" style="margin-top:18px;">
+        <div class="field">
+          <label for="actSub1">ACT subject test 1 <span class="hint">(optional, out of 36 — e.g. Biology)</span></label>
+          <input type="number" id="actSub1" min="0" max="36" placeholder="e.g. 26">
+        </div>
+        <div class="field">
+          <label for="actSub2">ACT subject test 2 <span class="hint">(optional, out of 36 — e.g. Math 1)</span></label>
+          <input type="number" id="actSub2" min="0" max="36" placeholder="e.g. 24">
+        </div>
+      </div>
+      <div class="act-preview" id="actPreview2"></div>
+    </div>
+
+    <div class="grid" style="margin-top:26px;">
+      <div class="field">
+        <label for="gpa">GPA <span class="hint">(out of 40)</span></label>
+        <input type="number" id="gpa" min="0" max="40" step="0.1" placeholder="e.g. 36">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step-label"><span class="num">3</span><h2>Choose university type</h2></div>
+    <div class="uni-options">
+      <input type="radio" name="uniType" id="uniGov" value="gov" checked>
+      <label for="uniGov"><span class="name">Government</span><span class="sub">Min. 1050 required</span></label>
+      <input type="radio" name="uniType" id="uniPriv" value="private">
+      <label for="uniPriv"><span class="name">Private / National</span><span class="sub">Minimum 800</span></label>
+      <input type="radio" name="uniType" id="uniInst" value="institute">
+      <label for="uniInst"><span class="name">Higher Institute</span><span class="sub">Min. 890 required</span></label>
+    </div>
+    <button class="calc" onclick="calculate()">Calculate My Percentage</button>
+  </div>
+
+  <div class="card result" id="resultBox">
+    <div class="result-inner">
+      <div class="badge" id="badge" style="--p:0;">
+        <div class="pct" id="pctValue">0<span>%</span></div>
+      </div>
+      <div class="breakdown">
+        <h3>Score breakdown</h3>
+        <div class="status warn" id="conflictWarning" style="display:none;margin-bottom:12px;">Please enter the score for only the subject test you actually took — EST 2 Subject tests, or ACT subject tests.</div>
+        <div class="row"><span class="k" id="sat1Label">Exam 1 contribution</span><span class="v" id="sat1Part">0.00</span></div>
+        <div class="row"><span class="k" id="sat2Label">Exam 2 contribution</span><span class="v" id="sat2Part">0.00</span></div>
+        <div class="row"><span class="k">GPA contribution</span><span class="v" id="gpaPart">0.00</span></div>
+        <div class="row"><span class="k">Total</span><span class="v" id="totalPart">0.00</span></div>
+        <div class="status" id="statusBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rules-title">
+    <h2>How the bonus rules work</h2>
+    <p>Egypt's Supreme Council of Universities applies a different weighting formula depending on the university type. Here's each one explained separately.</p>
+  </div>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <h3>Government Universities</h3>
+      <span class="tag">Minimum Exam 1 score: 1050 / 1600</span>
+      <ul>
+        <li>GPA is added directly to the total (out of 40).</li>
+        <li>Exam 1 normally counts as: score × 60 ÷ 1600.</li>
+        <li>Exam 2 / subject score counts only if it reaches 1100 out of 1600, weighted as: score × 15 ÷ 1600.</li>
+      </ul>
+      <div class="bonus">
+        <b>Bonus rule</b>
+        If your Exam 1 score is 1090 or higher, the weight jumps from ×60 to <b>×69</b> — so the whole Exam 1 score is recalculated as score × 69 ÷ 1600, giving high scorers extra credit.
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>Private &amp; National Universities</h3>
+      <span class="tag">Minimum Exam 1 score: 800 / 1600</span>
+      <ul>
+        <li>GPA is added directly to the total (out of 40).</li>
+        <li>Exam 1 normally counts as: score × 60 ÷ 1600.</li>
+        <li>Exam 2 / subject score counts if it reaches 900 out of 1600, weighted as: score × 15 ÷ 1600.</li>
+        <li>National (Ahliya) universities follow this same formula as private universities.</li>
+      </ul>
+      <div class="bonus">
+        <b>Bonus rule</b>
+        If your Exam 1 score is 1090 or higher, the weight jumps from ×60 to <b>×75</b> — the highest bonus of the three tracks, so private and national universities reward a strong Exam 1 score the most.
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <h3>Higher Institutes</h3>
+      <span class="tag">Minimum Exam 1 score: 890 / 1600</span>
+      <ul>
+        <li>GPA is added directly to the total (out of 40).</li>
+        <li>Exam 1 normally counts as: score × 60 ÷ 1600.</li>
+        <li>Exam 2 / subject score counts if it reaches 900 out of 1600, weighted as: score × 15 ÷ 1600.</li>
+      </ul>
+      <div class="bonus">
+        <b>Bonus rule</b>
+        Same as government universities: if your Exam 1 score is 1090 or higher, the weight jumps from ×60 to <b>×69</b>.
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p><b>ACT conversion:</b> Egyptian coordination scores ACT using Reading, English/Writing, and Math only. Your Exam 1 equivalent is the average of these three sections (out of 36), converted to a 1600-point scale using the official ACT–SAT concordance table.</p>
+    <p><b>Subject tests:</b> Only one subject-test source counts, matching the exam you actually took — this applies the same way whether you selected SAT, EST, or ACT above. If you sat EST subject tests, enter the combined total (already out of 1600) in the EST 2 Subject tests field. If you sat ACT subject tests instead, enter each section score (out of 36) in the two ACT subject test fields — they're converted to an 800-point scale each and summed. Filling in one source locks the other automatically, so only one can ever be counted.</p>
+    <p><b>Basis of calculation:</b> Total % = GPA (added as-is) + Exam 1 share [score × 60 ÷ 1600, or the bonus multiplier above if the score is 1090 or higher] + Exam 2 share [score × 15 ÷ 1600, only if the minimum threshold for the chosen university type is met]. EST follows the exact same formula as SAT.</p>
+    <p>This tool is an approximation based on the publicly announced rules of Egypt's Supreme Council of Universities. Minor details can change year to year, and each university may apply its own specific criteria, so please confirm with the university you're applying to if it's private or national, or with the official universities coordination office (Tansik) if it's government, before making any final decision.</p>
+    <p><b>A note on cohorts:</b> this calculator reflects the formula currently published for students graduating in <b>2026–2027</b>. The Ministry of Higher Education has not yet issued the equivalency rules for the <b>2027–2028</b> cohort — once those are announced, a separate, dedicated calculator will be built for that class rather than folded into this one.</p>
+  </footer>
+
+</div>
+
+<script>
+  // Official ACT–SAT concordance points: [ACT score, SAT score]
+  const act1Table = [[9,610],[10,640],[11,680],[12,720],[13,770],[14,820],[15,870],[16,910],[17,950],[18,980],[19,1020],[20,1050],[21,1090],[22,1120],[23,1150],[24,1190],[25,1220],[26,1240],[27,1290],[28,1320],[29,1350],[30,1380],[31,1410],[32,1440],[33,1480],[34,1520],[35,1560],[36,1600]];
+  const act2Table = [[10,260],[11,280],[12,310],[13,330],[14,360],[15,400],[16,430],[17,470],[18,500],[19,510],[20,520],[21,530],[22,540],[23,560],[24,580],[25,590],[26,610],[27,640],[28,660],[29,680],[30,700],[31,710],[32,720],[33,740],[34,760],[35,780],[36,800]];
+
+  function convertScore(score, table, zeroPoint){
+    if(score<=0) return 0;
+    const firstX = table[0][0], firstY = table[0][1];
+    const lastX = table[table.length-1][0], lastY = table[table.length-1][1];
+    if(score >= lastX) return lastY;
+    if(score <= firstX){
+      return zeroPoint + (firstY - zeroPoint) * (score / firstX);
+    }
+    for(let i=0;i<table.length-1;i++){
+      const [x1,y1] = table[i], [x2,y2] = table[i+1];
+      if(score >= x1 && score <= x2){
+        return y1 + (y2-y1) * (score-x1) / (x2-x1);
+      }
+    }
+    return lastY;
+  }
+  function round10(v){ return Math.round(v/10)*10; }
+
+  // toggle exam field sets
+  document.querySelectorAll('input[name=examType]').forEach(r=>{
+    r.addEventListener('change', updateExamFields);
+  });
+  function updateExamFields(){
+    const type = document.querySelector('input[name=examType]:checked').value;
+    document.getElementById('fieldsSatEst').classList.toggle('active', type!=='ACT');
+    document.getElementById('fieldsAct').classList.toggle('active', type==='ACT');
+  }
+
+  ['actReading','actWriting','actMath','actScience'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updateActPreview1);
+  });
+  ['actSub1','actSub2'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updateActPreview2);
+  });
+
+  // Mutual exclusion: EST 2 vs ACT subject tests — only one source allowed
+  const est2Field = document.getElementById('est2');
+  const actSub1Field = document.getElementById('actSub1');
+  const actSub2Field = document.getElementById('actSub2');
+
+  function updateSubjectTestLock(){
+    const estFilled = parseFloat(est2Field.value) > 0;
+    const actFilled = (parseFloat(actSub1Field.value) > 0) || (parseFloat(actSub2Field.value) > 0);
+
+    est2Field.disabled = actFilled;
+    actSub1Field.disabled = estFilled;
+    actSub2Field.disabled = estFilled;
+
+    est2Field.placeholder = actFilled ? 'Clear ACT subject tests first' : 'e.g. 1100';
+    const actPlaceholder1 = estFilled ? 'Clear EST 2 first' : 'e.g. 26';
+    const actPlaceholder2 = estFilled ? 'Clear EST 2 first' : 'e.g. 24';
+    actSub1Field.placeholder = actPlaceholder1;
+    actSub2Field.placeholder = actPlaceholder2;
+  }
+
+  [est2Field, actSub1Field, actSub2Field].forEach(f=>{
+    f.addEventListener('input', updateSubjectTestLock);
+  });
+
+  function updateActPreview1(){
+    const r = parseFloat(document.getElementById('actReading').value);
+    const w = parseFloat(document.getElementById('actWriting').value);
+    const m = parseFloat(document.getElementById('actMath').value);
+    const sci = parseFloat(document.getElementById('actScience').value);
+    const box = document.getElementById('actPreview1');
+    if(isNaN(r) || isNaN(w) || isNaN(m)){ box.classList.remove('show'); return; }
+    const composite = Math.round((r+w+m)/3);
+    const sat1eq = round10(convertScore(composite, act1Table, 400));
+    let html = 'ACT composite (Reading, Writing, Math): <b>'+composite+' / 36</b> → Exam 1 equivalent: <b>'+sat1eq+' / 1600</b>';
+    if(!isNaN(sci)){ html += '<br>Science ('+sci+'/36) is recorded but not counted toward the composite.'; }
+    box.innerHTML = html;
+    box.classList.add('show');
+  }
+  function updateActPreview2(){
+    const s1 = parseFloat(document.getElementById('actSub1').value);
+    const s2 = parseFloat(document.getElementById('actSub2').value);
+    const box = document.getElementById('actPreview2');
+    if(isNaN(s1) && isNaN(s2)){ box.classList.remove('show'); return; }
+    const v1 = isNaN(s1) ? 0 : round10(convertScore(s1, act2Table, 200));
+    const v2 = isNaN(s2) ? 0 : round10(convertScore(s2, act2Table, 200));
+    box.innerHTML = 'ACT subject conversion: '+(isNaN(s1)?'—':v1)+' + '+(isNaN(s2)?'—':v2)+' → Subject test equivalent: <b>'+(v1+v2)+' / 1600</b>';
+    box.classList.add('show');
+  }
+
+  function calculate(){
+    const examType = document.querySelector('input[name=examType]:checked').value;
+    const uniType = document.querySelector('input[name=uniType]:checked').value;
+    const gpa = parseFloat(document.getElementById('gpa').value) || 0;
+
+    let sat1 = 0, sat1LabelText;
+
+    if(examType === 'ACT'){
+      const r = parseFloat(document.getElementById('actReading').value) || 0;
+      const w = parseFloat(document.getElementById('actWriting').value) || 0;
+      const m = parseFloat(document.getElementById('actMath').value) || 0;
+      const composite = Math.round((r+w+m)/3);
+      sat1 = round10(convertScore(composite, act1Table, 400));
+      sat1LabelText = 'Exam 1 (ACT '+composite+'/36 → '+sat1+'/1600)';
+    } else {
+      sat1 = parseFloat(document.getElementById('sat1').value) || 0;
+      sat1LabelText = examType + ' Exam 1 contribution';
+    }
+
+    // Shared subject-test fields — only one source should be filled
+    const estVal = parseFloat(document.getElementById('est2').value) || 0;
+    const actS1 = parseFloat(document.getElementById('actSub1').value) || 0;
+    const actS2 = parseFloat(document.getElementById('actSub2').value) || 0;
+    const actProvided = actS1 > 0 || actS2 > 0;
+
+    const sourcesFilled = [estVal > 0, actProvided].filter(Boolean).length;
+    const conflict = sourcesFilled > 1;
+
+    let sat2 = 0, sat2LabelText = 'Subject tests contribution';
+    if(!conflict){
+      if(estVal > 0){
+        sat2 = estVal;
+        sat2LabelText = 'EST 2 Subject tests contribution';
+      } else if(actProvided){
+        const v1 = actS1 > 0 ? round10(convertScore(actS1, act2Table, 200)) : 0;
+        const v2 = actS2 > 0 ? round10(convertScore(actS2, act2Table, 200)) : 0;
+        sat2 = v1 + v2;
+        sat2LabelText = 'ACT subject tests contribution (' + sat2 + '/1600)';
+      }
+    }
+
+    let minSat1, sat2Threshold, highMultiplier, uniName;
+    if(uniType === 'gov'){ minSat1=1050; sat2Threshold=1100; highMultiplier=69; uniName='government universities'; }
+    else if(uniType === 'private'){ minSat1=0; sat2Threshold=900; highMultiplier=75; uniName='private & national universities'; }
+    else { minSat1=890; sat2Threshold=900; highMultiplier=69; uniName='higher institutes'; }
+
+    const lowMultiplier = 60;
+    const sat1Multiplier = sat1 >= 1090 ? highMultiplier : lowMultiplier;
+    const sat1Part = (sat1 * sat1Multiplier) / 1600;
+
+    const sat2Valid = !conflict && sat2 >= sat2Threshold && sat2 > 0;
+    const sat2Part = sat2Valid ? (sat2 * 15) / 1600 : 0;
+
+    const total = sat1Part + sat2Part + gpa;
+
+    document.getElementById('sat1Label').textContent = sat1LabelText + ' (×' + sat1Multiplier + ')';
+    document.getElementById('sat2Label').textContent = sat2LabelText + (sat2Valid ? '' : ' (not counted)');
+    document.getElementById('sat1Part').textContent = sat1Part.toFixed(2);
+    document.getElementById('sat2Part').textContent = sat2Part.toFixed(2);
+    document.getElementById('gpaPart').textContent = gpa.toFixed(2);
+    document.getElementById('totalPart').textContent = total.toFixed(2) + ' %';
+    document.getElementById('pctValue').innerHTML = total.toFixed(1) + '<span>%</span>';
+    document.getElementById('badge').style.setProperty('--p', Math.min(total,100));
+
+    document.getElementById('conflictWarning').style.display = conflict ? 'block' : 'none';
+
+    const statusBox = document.getElementById('statusBox');
+    if(uniType === 'private'){
+      statusBox.className = 'status ok';
+      statusBox.textContent = 'Percentage calculated for private & national universities.';
+    } else if(sat1 < minSat1){
+      statusBox.className = 'status warn';
+      statusBox.textContent = 'Exam 1 score is below the minimum required for ' + uniName + ' (' + minSat1 + ').';
+    } else {
+      statusBox.className = 'status ok';
+      statusBox.textContent = 'Exam 1 score meets the minimum required for ' + uniName + '.';
+    }
+
+    document.getElementById('resultBox').classList.add('show');
+    document.getElementById('resultBox').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+</script>
+
+</body>
+</html>
